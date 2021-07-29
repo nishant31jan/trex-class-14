@@ -1,4 +1,4 @@
-var trex, trex_running, trex_collided;
+var trex, trex_running, trex_collided, gameover, restart,gameoverImg,restartImg;
 var ground, invisibleGround, groundImage;
 
 
@@ -24,12 +24,17 @@ function preload(){
   obstacle4 = loadImage("obstacle4.png");
   obstacle5 = loadImage("obstacle5.png");
   obstacle6 = loadImage("obstacle6.png");
-  
+  restartImg = loadImage("restart.png");
+  gameoverImg = loadImage("gameOver.png")
 }
 
 function setup() {
   createCanvas(600, 200);
   
+ // gameover.visible=false;
+
+
+
   trex = createSprite(50,180,20,50);
   trex.addAnimation("running", trex_running);
   trex.addAnimation("collided" , trex_collided)
@@ -44,11 +49,15 @@ function setup() {
   invisibleGround.visible = false;
   
   console.log("Hello" + 5);
-  
+  //trex.debug=true;
+
   score = 0;
 
   obstaclesGroup=new Group();
   cloudsGroup=new Group();
+
+  trex.setCollider("circle",0,0,40)
+    
 
   gamestate="play"
 
@@ -57,17 +66,19 @@ function setup() {
 function draw() {
   background(180);
   text("Score: "+ score, 500,50);
+  console.log(gamestate)
  
   
   if(gamestate=="play"){
     ground.velocityX = -4;
 
     
-    if(keyDown("space")&& trex.y >= 130) {
-      trex.velocityY = -13;
+    if(keyDown("space") && trex.y >= 100) {
+      trex.velocityY = -12;
 
-      trex.velocityY = trex.velocityY + 0.8
+      
     }
+    trex.velocityY = trex.velocityY + 0.8
 
     if (ground.x < 0){
       ground.x = ground.width/2;
@@ -84,12 +95,25 @@ function draw() {
     if(obstaclesGroup.isTouching(trex)){
 
       gamestate="end";
+      
     }
 
   }
   else if(gamestate=="end"){
     ground.velocityX = 0;
   
+    trex.velocityY=0;
+    trex.changeAnimation("collided",trex_collided);
+
+    gameover=createSprite(300,100,60,30);
+gameover.addImage(gameoverImg);
+gameover.scale=2;
+restart=createSprite(300,140,20,20);
+restart.addImage(restartImg);
+restart.scale=0.5;
+
+    obstaclesGroup.setLifetimeEach(-1);
+    cloudsGroup.setLifetimeEach(-1);
     obstaclesGroup.setVelocityXEach(0);
     cloudsGroup.setVelocityXEach(0); 
   }
